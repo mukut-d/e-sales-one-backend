@@ -15,7 +15,10 @@ app.use(express.json());
 // });
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: [
+    "http://localhost:5173",
+    "https://e-sales-qg27ch8t5-mukut-ds-projects.vercel.app",
+  ],
   method: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type"],
   credentials: true,
