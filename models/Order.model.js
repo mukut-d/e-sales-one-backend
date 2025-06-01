@@ -36,6 +36,7 @@ const orderSchema = new mongoose.Schema(
       city: { type: String, required: true },
       state: { type: String, required: true },
       zip: { type: String, required: true },
+      email: { type: String, required: true },
 
       phoneNo: { type: String, required: true },
     },
@@ -44,11 +45,7 @@ const orderSchema = new mongoose.Schema(
       default: "ONLINE",
       required: true,
     },
-    paymentStatus: {
-      type: String,
-      enum: ["Pending", "Confirm", "Failed", "Refunded"],
-      default: "Pending",
-    },
+
     orderDate: {
       type: Date,
       default: Date.now,

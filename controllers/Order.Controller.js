@@ -1,10 +1,11 @@
-const mongoose = require("mongoose");
 require("dotenv").config();
 
 const Order = require("../models/Order.model");
+const sendEmail = require("../utils/mailer");
+const successTemplate = require("../templates/orderSuccessTemplate.js");
+const failureTemplate = require("../templates/orderFailureTemplate.js");
 
 const createOrder = async (req, res) => {
-  // console.log("req body " + JSON.stringify(req.body));
   try {
     const {
       fullname,
@@ -19,7 +20,7 @@ const createOrder = async (req, res) => {
       price,
       quantity,
       color,
-      status = 1,
+      status,
     } = req.body;
 
     if (
@@ -57,19 +58,6 @@ const createOrder = async (req, res) => {
       });
     }
 
-    let paymentStatus = "Confirm";
-    if (status === 1) {
-      paymentStatus = "Confirm";
-    }
-
-    if (status === 2) {
-      paymentStatus = "Declined";
-    }
-
-    if (status === 3) {
-      paymentStatus = "Gateway Error";
-    }
-
     const updatedData = {
       items: [
         {
@@ -88,13 +76,29 @@ const createOrder = async (req, res) => {
         state,
         zip,
         phoneNo,
+        email,
       },
       paymentMethod: "ONLINE",
-      paymentStatus: paymentStatus,
     };
 
     const order = new Order(updatedData);
     await order.save();
+
+    if (status == 1) {
+      await sendEmail(
+        order.shippingAddress.email,
+        "✅ Order Confirmed",
+        successTemplate(order)
+      );
+    }
+
+    if (status == 2 || status == 3) {
+      await sendEmail(
+        order.shippingAddress.email,
+        "❌ Transaction Failed",
+        failureTemplate(order)
+      );
+    }
 
     res.status(201).json({
       message: "Order created successfully",
